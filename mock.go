@@ -107,16 +107,17 @@ func (h redisClientHook) ProcessHook(_ redis.ProcessHook) redis.ProcessHook {
 
 func (h redisClientHook) ProcessPipelineHook(_ redis.ProcessPipelineHook) redis.ProcessPipelineHook {
 	return func(ctx context.Context, cmds []redis.Cmder) error {
+		var lastErr error
 		for _, cmd := range cmds {
 			err := h.fn(cmd)
 			if h.returnErr != nil && (err == nil || cmd.Err() == nil) {
 				err = h.returnErr
 			}
 			if err != nil {
-				return err
+				lastErr = err
 			}
 		}
-		return nil
+		return lastErr
 	}
 }
 
@@ -2862,29 +2863,29 @@ func (m *mock) ExpectTSMRangeWithArgs(fromTimestamp int, toTimestamp int, filter
 }
 
 func (m *mock) ExpectTSMRevRange(fromTimestamp int, toTimestamp int, filterExpr []string) *ExpectedMapStringSliceInterface {
-    e := &ExpectedMapStringSliceInterface{}
-    e.cmd = m.factory.TSMRevRange(m.ctx, fromTimestamp, toTimestamp, filterExpr)
-    m.pushExpect(e)
-    return e
+	e := &ExpectedMapStringSliceInterface{}
+	e.cmd = m.factory.TSMRevRange(m.ctx, fromTimestamp, toTimestamp, filterExpr)
+	m.pushExpect(e)
+	return e
 }
 
 func (m *mock) ExpectTSMRevRangeWithArgs(fromTimestamp int, toTimestamp int, filterExpr []string, options *redis.TSMRevRangeOptions) *ExpectedMapStringSliceInterface {
-    e := &ExpectedMapStringSliceInterface{}
-    e.cmd = m.factory.TSMRevRangeWithArgs(m.ctx, fromTimestamp, toTimestamp, filterExpr, options)
-    m.pushExpect(e)
-    return e
+	e := &ExpectedMapStringSliceInterface{}
+	e.cmd = m.factory.TSMRevRangeWithArgs(m.ctx, fromTimestamp, toTimestamp, filterExpr, options)
+	m.pushExpect(e)
+	return e
 }
 
 func (m *mock) ExpectTSMGet(filters []string) *ExpectedMapStringSliceInterface {
-    e := &ExpectedMapStringSliceInterface{}
-    e.cmd = m.factory.TSMGet(m.ctx, filters)
-    m.pushExpect(e)
-    return e
+	e := &ExpectedMapStringSliceInterface{}
+	e.cmd = m.factory.TSMGet(m.ctx, filters)
+	m.pushExpect(e)
+	return e
 }
 
 func (m *mock) ExpectTSMGetWithArgs(filters []string, options *redis.TSMGetOptions) *ExpectedMapStringSliceInterface {
-    e := &ExpectedMapStringSliceInterface{}
-    e.cmd = m.factory.TSMGetWithArgs(m.ctx, filters, options)
-    m.pushExpect(e)
-    return e
+	e := &ExpectedMapStringSliceInterface{}
+	e.cmd = m.factory.TSMGetWithArgs(m.ctx, filters, options)
+	m.pushExpect(e)
+	return e
 }
